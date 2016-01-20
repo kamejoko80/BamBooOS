@@ -235,7 +235,7 @@ void BOS_SwitchContext (void)
 { 
     uint32_t i, task_id;
     uint32_t task_found = 0;
-  uint32_t task_idx;
+    uint32_t task_idx;
     uint32_t task_priority = LOWEST_PRIORITY;
     uint32_t flags, wait_evt, start_time, expire;
     
@@ -246,7 +246,7 @@ void BOS_SwitchContext (void)
         wait_evt   = bos_TaskTable[i].task->wait_evt;
         start_time = bos_TaskTable[i].task->start_time;
         expire     = bos_TaskTable[i].task->expire;
-    task_id    = bos_TaskTable[i].task->task_id;		
+        task_id    = bos_TaskTable[i].task->task_id;		
 
         if(( flags == STATE_READY) || 
             ( (flags == STATE_WAIT) && 
@@ -271,14 +271,14 @@ void BOS_SwitchContext (void)
     {
         /* Change previous preemted stack to ready state */
         if(bos_TaskTable[bos_CurrentTaskIdx].task->flags == STATE_RUN)
-            {
-                bos_TaskTable[bos_CurrentTaskIdx].task->flags = STATE_READY;
-            }
+        {
+            bos_TaskTable[bos_CurrentTaskIdx].task->flags = STATE_READY;
+        }
 
-            bos_CurrentTaskIdx = task_idx;
-            bos_TaskTable[task_idx].task->flags = STATE_RUN;
+        bos_CurrentTaskIdx = task_idx;
+        bos_TaskTable[task_idx].task->flags = STATE_RUN;
 
-    /* if task delay then reset expire and start_time */ 		
+        /* if task delay then reset expire and start_time */ 		
         if (bos_TaskTable[task_idx].task->expire > 0)
         {
             bos_TaskTable[task_idx].task->expire = 0;
@@ -316,18 +316,18 @@ bool BOS_CheckMbxForTask(uint32_t task_id)
     if (bos_PostedMBXCount)
     {
         /* check for each item */
-            list_for_each(pos, &bos_mbx_list.list)
-            {
-                /* get entry from list */
-                mbx = list_entry(pos, bos_mbx_t, list);
+        list_for_each(pos, &bos_mbx_list.list)
+        {
+            /* get entry from list */
+            mbx = list_entry(pos, bos_mbx_t, list);
 
-                /* check mail receive*/
-                if ((mbx->receiver_id == task_id) && (mbx->flag == MBX_POS))
-                {
-                    return true;
-                }
+            /* check mail receive*/
+            if ((mbx->receiver_id == task_id) && (mbx->flag == MBX_POS))
+            {
+                return true;
             }
         }
+    }
     return false;
 }
 
