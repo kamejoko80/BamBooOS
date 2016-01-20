@@ -1,5 +1,5 @@
 # BamBooOS
-RTOS for ARM cortex-M
+RTOS for ARM cortex-M0+
 
 Feature :
 
@@ -15,6 +15,10 @@ Support :
   
 IDE :
   
-  - MDK (KEIL for ARM)  
+  - MDK (KEIL for ARM)
+
+Platform:
+
+  - FRDM-KL46Z  
    
   
