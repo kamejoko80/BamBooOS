@@ -210,7 +210,7 @@ void BOS_Delay (uint32_t tick)
         task->expire = tick;
 
         /* Trigger PendSV, switch to another task */
-    SCB->ICSR |= (1 << 28);
+        SCB->ICSR |= (1 << 28);
     }
 }
 
