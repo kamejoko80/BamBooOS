@@ -12,12 +12,12 @@
 
 typedef struct
 {
-  uint8_t   *data;           /* data buffer */
-	uint32_t  len;            /* data len */ 
-	uint32_t  sender_id;      /* sender task id */ 
-	uint32_t  receiver_id;    /* receiver task id */
-	uint32_t  flag;           /* mailbox status */  
-	struct list_head list;   /* linked list */ 	
-}	bos_mbx_t;
+    uint8_t   *data;           /* data buffer */
+    uint32_t  len;            /* data len */ 
+    uint32_t  sender_id;      /* sender task id */ 
+    uint32_t  receiver_id;    /* receiver task id */
+    uint32_t  flag;           /* mailbox status */  
+    struct list_head list;   /* linked list */ 	
+}bos_mbx_t;
 
 #endif /* __BOS_MBX_H__ */

@@ -3,7 +3,7 @@
 
 void mag3110_write(uint8_t addr, uint8_t data)
 {
-	  i2c_delay();
+    i2c_delay();
     i2c_start(I2C0);
     i2c_write(I2C0, MAG3110_I2C_ADDR | I2C_WRITE);
     i2c_write(I2C0, addr);
@@ -13,7 +13,7 @@ void mag3110_write(uint8_t addr, uint8_t data)
 
 uint8_t mag3110_read(uint8_t addr)
 {
-	  i2c_delay();
+    i2c_delay();
     i2c_start(I2C0);
     i2c_write(I2C0, MAG3110_I2C_ADDR | I2C_WRITE);
     i2c_write(I2C0, addr);
@@ -29,29 +29,29 @@ uint8_t mag3110_read(uint8_t addr)
 
 void mag3110_init(void)
 {
-	
-   uint8_t deviceid;
-	
-	 /* read sensor ID */
-	 deviceid = mag3110_read(0x07); 
 
-	 /* check available sensor */
-	 if (deviceid != 0xC4)
-	 {
-			printf("mag3110: Device not found\r\n");
-	 }	
-		
-  //CTRL_REG1
-  //DR2|DR1|DR0|OS1|OS0|FastRead|Trigger|ActiveMode|
-  // 0 | 1 | 1 | 1 | 1 |    0   |   0   |    1     |
-	mag3110_write(0x10, 0x79);
-	i2c_delay();
-	i2c_delay();
+    uint8_t deviceid;
+
+    /* read sensor ID */
+    deviceid = mag3110_read(0x07); 
+
+    /* check available sensor */
+    if (deviceid != 0xC4)
+    {
+        printf("mag3110: Device not found\r\n");
+    }
+
+    //CTRL_REG1
+    //DR2|DR1|DR0|OS1|OS0|FastRead|Trigger|ActiveMode|
+    // 0 | 1 | 1 | 1 | 1 |    0   |   0   |    1     |
+    mag3110_write(0x10, 0x79);
+    i2c_delay();
+    i2c_delay();
   
-	//CTRL_REG2: 
-  //AutoMagRst|---|Raw|Mag_Rst|---|---|---|---|
-  //    1     | 0 | 0 |   0   | 0 | 0 | 0 | 0 |
-	mag3110_write(0x11, 0x80);
+    //CTRL_REG2: 
+    //AutoMagRst|---|Raw|Mag_Rst|---|---|---|---|
+    //    1     | 0 | 0 |   0   | 0 | 0 | 0 | 0 |
+    mag3110_write(0x11, 0x80);
 }
 
 // Read a signed 14-bit value from (reg, reg+1)

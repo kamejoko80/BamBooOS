@@ -2,8 +2,8 @@
 
 void i2c_delay(void)
 {
-	  uint32_t i;
-	  for(i = 0; i < 100; i++) {	}				
+    uint32_t i;
+    for(i = 0; i < 100; i++) {  }
 }
 
 
@@ -37,13 +37,13 @@ int i2c_write(I2C_Type *p, uint8_t data)
 void i2c_init(I2C_Type *p)
 {
     // Enable clocks    
-	  SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
+    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
     SIM->SCGC4 |= SIM_SCGC4_I2C0_MASK;  	
-	
+
     // Configure GPIO for I2C    
-	  PORTE->PCR[24] = PORT_PCR_MUX(5); 
-	  PORTE->PCR[25] = PORT_PCR_MUX(5);
-	
+    PORTE->PCR[24] = PORT_PCR_MUX(5); 
+    PORTE->PCR[25] = PORT_PCR_MUX(5);
+
     p->F  = 0x14;              // Baudrate settings:  ICR=0x14, MULT=0
     p->C1 = I2C_C1_IICEN_MASK; // Enable:  IICEN=1
 }

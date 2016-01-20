@@ -12,7 +12,7 @@ void Init_Led (void)
     /* Enable clock for PORTE & PORTD*/
     SIM->SCGC5 |= ( SIM_SCGC5_PORTD_MASK
                | SIM_SCGC5_PORTE_MASK );
-    /* 
+    /*
     * Initialize the RED LED (PTE5)
     */
     PORTE->PCR[29] = PORT_PCR_MUX(1);

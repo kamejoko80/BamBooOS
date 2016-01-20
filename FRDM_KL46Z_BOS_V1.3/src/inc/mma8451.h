@@ -24,10 +24,10 @@
 #define MMA8451_PL_PUB            1
 #define MMA8451_PL_PDF            2
 #define MMA8451_PL_PDB            3
-#define MMA8451_PL_LRF            4  
-#define MMA8451_PL_LRB            5  
-#define MMA8451_PL_LLF            6  
-#define MMA8451_PL_LLB            7  
+#define MMA8451_PL_LRF            4
+#define MMA8451_PL_LRB            5
+#define MMA8451_PL_LLF            6
+#define MMA8451_PL_LLB            7
 
 #define MMA8451_RANGE_8_G         0x02  // +/- 8g
 #define MMA8451_RANGE_4_G         0x01  // +/- 4g

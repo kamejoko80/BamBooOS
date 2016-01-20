@@ -12,7 +12,7 @@
 #include "bos_mbx.h"
 
 /* BOS user config */
-#define MAX_TASKS 			10
+#define MAX_TASKS       10
 #define MAX_NAME_SIZE   32 
 
 /* Task state */
@@ -49,53 +49,53 @@
 
 #define TASK_CREATE(task, size) uint8_t task##_stack[size] __attribute__((aligned (4)));\
                                 const uint32_t task##_stack_size = size;\
-																const char* task##name = #task;\
-														    task_t task;\
-																task_t *p##task = &task;
+                                const char* task##name = #task;\
+                                task_t task;\
+                                task_t *p##task = &task;
 
 #define TASK_INIT(task, func, pri) BOS_TaskInit(task##name, p##task, (void*)task##_stack, task##_stack_size, func, pri)
 
 typedef struct
 {
-  /* sw stack frame */
-  uint32_t r4;
-	uint32_t r5;
-	uint32_t r6;
-	uint32_t r7;
-	uint32_t r8;
-	uint32_t r9;
-	uint32_t r10;
-	uint32_t r11;
+    /* sw stack frame */
+    uint32_t r4;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
+    uint32_t r8;
+    uint32_t r9;
+    uint32_t r10;
+    uint32_t r11;
 
-  /* hardware stack frame */
-	uint32_t r0;
-	uint32_t r1;
-	uint32_t r2;
-	uint32_t r3;
-	uint32_t r12;
-	uint32_t lr;
-	uint32_t pc;
-	uint32_t psr;
+    /* hardware stack frame */
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;
+    uint32_t pc;
+    uint32_t psr;
 
 } stack_frame_t;
 
 typedef struct
 {
-	char    name[MAX_NAME_SIZE];
-	void    *stack;
-	void    *stack_start;
-	uint32_t stack_size;     
-	uint32_t flags;
-	uint32_t wait_evt;
-	uint32_t task_id;
-	uint32_t start_time;
-	uint32_t expire;
-  uint32_t priority;	
+    char    name[MAX_NAME_SIZE];
+    void    *stack;
+    void    *stack_start;
+    uint32_t stack_size;     
+    uint32_t flags;
+    uint32_t wait_evt;
+    uint32_t task_id;
+    uint32_t start_time;
+    uint32_t expire;
+    uint32_t priority;
 } task_t;
 
 typedef struct
 {
-	task_t *task;
+    task_t *task;
 } task_table_t;
 
 uint32_t BOS_GetCurrentTaskID(void);
