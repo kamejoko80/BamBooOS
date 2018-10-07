@@ -1,5 +1,5 @@
-# BamBooOS
-RTOS for ARM cortex-M0+
+# BamBooOS_ARMV7M
+RTOS for ARMV7M
 
 Feature :
 
@@ -10,15 +10,14 @@ Feature :
 Support :
   
   - Timer one shot/cyclic run with call back function or generates event.
-  - Event precessing, set event, wait event. 
+  - Event precessing, set event, wait event.
   - Mail box.
   
 IDE :
   
-  - MDK (KEIL for ARM)
+  - EMBITZ
 
 Platform:
 
-  - FRDM-KL46Z  
-   
-  
+  - STM32F4 Discovery
+
