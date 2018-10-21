@@ -10,7 +10,7 @@
     .thumb
 
 /**
-  * @ingroup armv7a stack frame
+  * @ingroup armv7m stack frame
   * @{
   *
   * @file

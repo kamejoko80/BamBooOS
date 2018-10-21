@@ -1,5 +1,5 @@
 # BamBooOS_ARMV7M
-RTOS for ARMV7M
+RTOS for ARMV7-M
 
 Feature :
 
@@ -9,9 +9,19 @@ Feature :
 
 Support :
   
+1> OS kernel services:  
+  
   - Timer one shot/cyclic run with call back function or generates event.
   - Event precessing, set event, wait event.
   - Mail box.
+  - Mutex.
+
+2> OS platform services:
+
+  - FIFO
+  - Input
+  - System Trace
+  - Shell
   
 IDE :
   
@@ -20,4 +30,3 @@ IDE :
 Platform:
 
   - STM32F4 Discovery
-
