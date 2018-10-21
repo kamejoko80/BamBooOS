@@ -1,8 +1,13 @@
 /*
- *  Copyright   : 2015
- *  File name   : bos.c
- *  Author      : Dang Minh Phuong
- *  Description : Bamboo OS kernel
+ *  Copyright (C) : 2015
+ *  File name     : bos_kernel.c
+ *  Description   : Bamboo OS kernel
+ *  Author        : Dang Minh Phuong
+ *  Email         : kamejoko80@yahoo.com
+ *
+ *  This program is free software, you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  published by the Free Software Foundation.
  */
 
 #include "bos.h"
@@ -11,7 +16,7 @@
 #include "bos_mbx.h"
 
 /* Gobal variables */
-volatile task_table_t bos_TaskTable[MAX_TASKS];
+volatile task_table_t bos_TaskTable[MAX_NUM_TASK];
 volatile uint32_t     bos_TaskCount = 0;
 volatile uint32_t     bos_CurrentTaskIdx = 0;
 volatile uint32_t     bos_Registered_Timer = 0;
@@ -21,6 +26,8 @@ const    uint32_t     bos_StackPatternWord = STACK_PATTERN_WORD;
 
 /* External functions */
 extern void BOS_StartFirstStack(void);
+extern bool BOS_MutexStatusReleased(task_t *task);
+extern void BOS_MutexInit(void);
 
 /* External variable */
 extern bos_timer_t bos_timer_list;
@@ -35,7 +42,7 @@ void BOS_Start(task_t *task);
 void BOS_WaitEvent(uint32_t evt_mask);
 void BOS_ClearEvent(uint32_t evt_mask);
 void BOS_SetEvent(uint32_t evt_mask);
-bool BOS_CheckMbxForTask(uint32_t task_id);
+bool BOS_CheckMbxForTask(uint8_t task_id);
 void BOS_SaveContext(void);
 void BOS_SwitchContext(void);
 void BOS_LoadContext(void);
@@ -140,8 +147,9 @@ void BOS_TaskInit(const char* name, task_t *task, void *stack, uint32_t stack_si
     process_frame->r10 = 0x10;
     process_frame->r11 = 0x11;
 
+    /* Initialize task info */
     task->flags = STATE_READY;
-    task->task_id = bos_TaskCount;
+    task->task_id = bos_TaskCount + 1;
     task->wait_evt = 0;
     task->expire = 0;
     task->start_time = 0;
@@ -155,7 +163,7 @@ void BOS_TaskInit(const char* name, task_t *task, void *stack, uint32_t stack_si
         task->priority = priority;
     }
 
-    if(bos_TaskCount < MAX_TASKS)
+    if(bos_TaskCount < MAX_NUM_TASK)
     {
         bos_TaskTable[bos_TaskCount].task = task;
         bos_TaskCount++;
@@ -163,6 +171,7 @@ void BOS_TaskInit(const char* name, task_t *task, void *stack, uint32_t stack_si
     else
     {
         printf("Error number of task exceed max limit\r\n");
+        while(1);
     }
 }
 
@@ -172,16 +181,10 @@ void BOS_TaskInit(const char* name, task_t *task, void *stack, uint32_t stack_si
  * @param[in,out] void
  * @return        void
  */
-
-#define NVIC_SYSPRI2              ((volatile uint32_t *) 0xe000ed20)
-#define MIN_INTERRUPT_PRIORITY    ( 255UL )
-#define NVIC_PENDSV_PRI           ( MIN_INTERRUPT_PRIORITY << 16UL )
-#define NVIC_SYSTICK_PRI          ( MIN_INTERRUPT_PRIORITY << 24UL )
-
 void BOS_Start (task_t *task)
 {
     /* Update current task idx */
-    bos_CurrentTaskIdx = task->task_id;
+    bos_CurrentTaskIdx = task->task_id - 1;
 
     /* Init timer list */
     INIT_LIST_HEAD(&bos_timer_list.list);
@@ -189,15 +192,17 @@ void BOS_Start (task_t *task)
     /* Init mail box */
     BOS_InitMBX();
 
+    /* Init mutex */
+    BOS_MutexInit();
+
     /* Make PendSV, CallSV and SysTick the same priority as the kernel. */
-    *(NVIC_SYSPRI2) |= NVIC_PENDSV_PRI;
-    *(NVIC_SYSPRI2) |= NVIC_SYSTICK_PRI;
+    NVIC_SetPriority(PendSV_IRQn, 255);
+    NVIC_SetPriority(SysTick_IRQn, 255);
 
     /* 1ms tick */
     SysTick_Config(SystemCoreClock/1000);
 
     BOS_StartFirstStack();
-
 }
 
 /**
@@ -254,14 +259,18 @@ void BOS_SwitchContext (void)
         expire     = bos_TaskTable[i].task->expire;
         task_id    = bos_TaskTable[i].task->task_id;
 
-        if(( flags == STATE_READY) ||
-            ( (flags == STATE_WAIT) &&
-            ( (wait_evt & bos_TaskEvt) || /* check incoming event */
-                ((expire > 0) && ((bos_SystemTick - start_time) >= expire)) || /* check delay */
-                (BOS_CheckMbxForTask(task_id) == true) /* check incoming mailbox */
-            )
-            )
-          )
+        if( ( flags == STATE_RUN)   ||
+            ( flags == STATE_READY) ||
+            ((flags == STATE_WAIT) &&
+                /* check incoming event */
+               ((wait_evt & bos_TaskEvt) ||
+                /* check delay */
+               ((expire > 0) && ((bos_SystemTick - start_time) >= expire)) ||
+                /* check incoming mailbox */
+               (BOS_CheckMbxForTask(task_id) == true) ||
+                /* check task requested a mutex which has been release the lock by other tasks */
+                BOS_MutexStatusReleased(bos_TaskTable[i].task)
+             )))
         {
             if(bos_TaskTable[i].task->priority <= task_priority)
             {
@@ -314,7 +323,7 @@ void BOS_LoadContext (void)
  * @param[in,out] void
  * @return        bool
  */
-bool BOS_CheckMbxForTask(uint32_t task_id)
+bool BOS_CheckMbxForTask(uint8_t task_id)
 {
     struct list_head *pos;
     bos_mbx_t *mbx;
@@ -345,7 +354,8 @@ bool BOS_CheckMbxForTask(uint32_t task_id)
  */
 uint32_t BOS_ExamineContextSwitch (uint32_t *priority)
 {
-    uint32_t i, task_id;
+    uint32_t i;
+    uint8_t task_id;
     uint32_t task_found = 0;
     uint32_t task_priority = LOWEST_PRIORITY;
     uint32_t flags, wait_evt, start_time, expire;
@@ -359,16 +369,19 @@ uint32_t BOS_ExamineContextSwitch (uint32_t *priority)
         expire     = bos_TaskTable[i].task->expire;
         task_id    = bos_TaskTable[i].task->task_id;
 
-        if((flags == STATE_READY) ||
-            ( (flags == STATE_WAIT) &&
-            ( (wait_evt & bos_TaskEvt) || /* check incoming event */
-              ((expire > 0) && ((bos_SystemTick - start_time) >= expire)) || /* check delay */
-               (BOS_CheckMbxForTask(task_id) == true) /* check incoming mailbox */
-            )
-            )
-        )
+        if( ( flags == STATE_READY) ||
+            ((flags == STATE_WAIT) &&
+                /* check incoming event */
+             ((wait_evt & bos_TaskEvt) ||
+                /* check delay */
+               ((expire > 0) && ((bos_SystemTick - start_time) >= expire)) ||
+                /* check incoming mailbox */
+               (BOS_CheckMbxForTask(task_id) == true) ||
+                /* check task requested a mutex which has been release the lock by other tasks */
+                BOS_MutexStatusReleased(bos_TaskTable[i].task)
+             )))
         {
-            if(bos_TaskTable[i].task->priority < task_priority)
+            if(bos_TaskTable[i].task->priority <= task_priority)
             {
                 task_priority = bos_TaskTable[i].task->priority;
                 task_found = 1;

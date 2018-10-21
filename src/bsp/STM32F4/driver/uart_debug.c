@@ -1,36 +1,21 @@
-/**
-  ******************************************************************************
-  * @file    uart_debug.c
-  * @author  Dang Minh Phuong
-  * @version V1.0.0
-  * @date    06/16/2013
-  * @brief   UART debug
-  ******************************************************************************
-  * @attention
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  *      http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  * <h2><center>&copy; COPYRIGHT (C)2012 Yuuichi Akagawa</center></h2>
-  *
-  ******************************************************************************
-  */
+/*
+ *  Copyright (C) : 2013
+ *  File name     : uart_debug.c
+ *  Description   : Uart debug driver
+ *  Author        : Dang Minh Phuong
+ *  Email         : kamejoko80@yahoo.com
+ *
+ *  This program is free software, you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  published by the Free Software Foundation.
+ */
 
 /* Includes */
 #include "stm32f4xx.h"
 #include "stm32f4xx_conf.h"
 #include <stdio.h>
 
-
-//USART2
+/* USART2 */
 USART_TypeDef* COM_USART        = USART2;
 GPIO_TypeDef*  COM_TX_PORT      = GPIOA;
 GPIO_TypeDef*  COM_RX_PORT      = GPIOA;
@@ -102,7 +87,6 @@ void uart_debug_init(void)
   SendChar
   Write character to Serial Port.
  *----------------------------------------------------------------------------*/
-
 unsigned char SendChar (unsigned char ch)  {
 
 #if 0
@@ -149,7 +133,7 @@ int _write (int fd, const void *buf, size_t count)
 {
   size_t CharCnt = 0x00;
 
-  (void)fd;                            /* Parameter is not used, suppress unused argument warning */
+  (void)fd; /* Parameter is not used, suppress unused argument warning */
    for (;count > 0x00; --count)
    {
      SendChar((unsigned char)*(uint8_t*)buf);

@@ -11,9 +11,10 @@
 #include "bos_common.h"
 #include "bos_timer.h"
 #include "bos_mbx.h"
+#include "bos_mutex.h"
 
 /* BOS user configuration */
-#define MAX_TASKS       10
+#define MAX_NUM_TASK    20
 #define MAX_NAME_SIZE   32
 
 /* Task state */
@@ -88,7 +89,7 @@ typedef struct
     uint32_t stack_size;
     uint32_t flags;
     uint32_t wait_evt;
-    uint32_t task_id;
+    uint8_t  task_id;
     uint32_t start_time;
     uint32_t expire;
     uint32_t priority;

@@ -1,16 +1,15 @@
 /*
-**
-**                           Main.c
-**
-**
-**********************************************************************/
-/*
-   Last committed:     $Revision : 1.2
-   Last changed by:    $Author   : Dang Minh Phuong
-   Last changed date:  $Date     : 20160427
-   ID:                 $Id       : 00
+ *  Copyright (C) : 2016
+ *  File name     : main.c
+ *  Description   : Bamboo OS blinky demo program
+ *  Author        : Dang Minh Phuong
+ *  Email         : kamejoko80@yahoo.com
+ *
+ *  This program is free software, you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  published by the Free Software Foundation.
+ */
 
-**********************************************************************/
 #include <stdio.h>
 #include "stm32f4_discovery.h"
 #include "stm32f4xx_conf.h"
@@ -19,6 +18,9 @@
 #include "uart_debug.h"
 #include "trace.h"
 
+/*
+ * Task create
+ */
 TASK_CREATE(task_01,        1024);
 TASK_CREATE(task_02,        1024);
 TASK_CREATE(task_03,        256);
@@ -27,6 +29,11 @@ TASK_CREATE(task_06,        1024);
 TASK_CREATE(task_07,        1024);
 TASK_CREATE(task_sys_trace, 1024);
 TASK_CREATE(task_idle,      256);
+
+/*
+ * Mutex lock create
+ */
+MUTEX_CREATE(mutex);
 
 /**
  * @brief         task_01_func
@@ -55,7 +62,9 @@ void task_02_func (void)
     {
         BOS_WaitEvent(EVT_MASK(2));
         BOS_ClearEvent(EVT_MASK(2));
+        BOS_MutexLock(&mutex);
         STM_EVAL_LEDToggle(LED3);
+        BOS_MutexUnLock(&mutex);
     }
 }
 
@@ -148,6 +157,12 @@ void task_07_func (void)
     }
 }
 
+/**
+ * @brief         timer_cb
+ * @param[in]     void
+ * @param[in,out] void
+ * @return        void
+ */
 void timer_cb(void)
 {
     SysTrace_Message("One shot timer callback func");
@@ -192,7 +207,12 @@ void task_idle_func (void)
     }
 }
 
-
+/**
+ * @brief         main
+ * @param[in]     void
+ * @param[in,out] void
+ * @return        void
+ */
 int main(void)
 {
     uart_debug_init();

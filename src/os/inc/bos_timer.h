@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "bos.h"
+#include <stdbool.h>
+#include "bos_list.h"
 
 typedef struct
 {
@@ -21,13 +22,13 @@ typedef struct
 }bos_timer_t;
 
 void BOS_TimerInit(bos_timer_t *timer);
-void BOS_CyclicTimerStart(bos_timer_t *timer, 
+void BOS_CyclicTimerStart(bos_timer_t *timer,
                           uint32_t start_time,
                           uint32_t interval,
                           uint32_t evt,
                           void (*cb_func)(void));
 
-void BOS_OneShotTimerStart(bos_timer_t *timer, 
+void BOS_OneShotTimerStart(bos_timer_t *timer,
                            uint32_t start_time,
                            uint32_t interval,
                            uint32_t evt,

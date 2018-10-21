@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) : 2018
  *  File name     : input.c
+ *  Description   : Bamboo OS input module
  *  Author        : Dang Minh Phuong
  *  Email         : kamejoko80@yahoo.com
  *

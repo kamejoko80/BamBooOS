@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) : 2018
  *  File name     : trace.c
+ *  Description   : Bamboo OS system trace module
  *  Author        : Dang Minh Phuong
  *  Email         : kamejoko80@yahoo.com
  *
@@ -54,6 +55,10 @@ static uint8_t g_SysTraceBuff[SYS_TRACE_BUF_SIZE];
  */
 static char g_SysTraceTempBuff[SYS_TRACE_MAX_MSG_LEN];
 
+/*
+ * System trace mutex_lock
+ */
+MUTEX_CREATE(mutex_trace);
 
 /***************************************************************
  *  EXTERNAL FUNCTION PROTOYPE
@@ -165,6 +170,8 @@ void SysTrace_Message(char *Format, ...)
     char *Message;
     char TimeStamp[TIME_FORMAT_SIZE] = {0};
 
+    BOS_MutexLock(&mutex_trace);
+
     /* Get system time stamp */
     Len = SysTrace_GetTime(TimeStamp);
 
@@ -194,21 +201,30 @@ void SysTrace_Message(char *Format, ...)
 
     /* Raise a system trace message queue event */
     BOS_SetEvent(EVT_TRACE_MSG_QUEUE);
+
+    BOS_MutexUnLock(&mutex_trace);
 }
 
 void SysTrace_PrintOut(void)
 {
+    BOS_MutexLock(&mutex_trace);
+
     if(FifoGetDataSize(&g_SysTraceFifo) >= SYS_TRACE_MAX_MSG_LEN)
     {
         memset(g_SysTraceTempBuff, 0, SYS_TRACE_MAX_MSG_LEN);
         FifoPopMulti(&g_SysTraceFifo, (uint8_t *)g_SysTraceTempBuff, SYS_TRACE_MAX_MSG_LEN);
         printf("%s\r\n", g_SysTraceTempBuff);
+
+        /* Raise a system trace message queue event */
+        BOS_SetEvent(EVT_TRACE_MSG_QUEUE);
     }
     else
     {
         /* Clear the event if there is no saved buffer data */
         BOS_ClearEvent(EVT_TRACE_MSG_QUEUE);
     }
+
+    BOS_MutexUnLock(&mutex_trace);
 }
 
 /*!
