@@ -177,14 +177,14 @@ void cmd_ps (void)
     PRINT("ID");
     go_right(LINE_SPACE_01 - strlen("ID"));
 
-    PRINT("STACK_NAME");
-    go_right(LINE_SPACE_02 - strlen("STACK_NAME"));
+    PRINT("TASK_NAME");
+    go_right(LINE_SPACE_02 - strlen("TASK_NAME"));
 
-    PRINT("STASK_SIZE");
-    go_right(LINE_SPACE_03 - strlen("STASK_SIZE"));
+    PRINT("STACK_SIZE");
+    go_right(LINE_SPACE_03 - strlen("STACK_SIZE"));
 
-    PRINT("STASK_FREE");
-    go_right(LINE_SPACE_04 - strlen("STASK_FREE"));
+    PRINT("STACK_FREE");
+    go_right(LINE_SPACE_04 - strlen("STACK_FREE"));
 
     PRINT("STATE");
     PRINT("\r\n\r\n");

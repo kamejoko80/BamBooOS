@@ -53,7 +53,7 @@ void Counter(void)
     /* Mutex lock request */
     BOS_MutexLock(&mutex);
 
-    SysTrace_Message("=======> Task ID %d has gotten the lock", task->task_id);
+    SysTrace_Message("=======> Task ID %d has occupied the lock", task->task_id);
 #endif
 
     for(i = 1; i <= 20; i++)
